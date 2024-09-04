@@ -10,9 +10,9 @@ import {
   ProcessorTokenCreateRequestProcessorEnum,
   Products,
 } from "plaid";
-import { plaidClient } from "../plaid";
 import { revalidatePath } from "next/cache";
 import { addFundingSource, createDwollaCustomer } from "./dwolla.actions";
+import { plaidClient } from "@/lib/plaid";
 
 const {
   APPWRITE_DATABASE_ID: DATABASE_ID,
@@ -47,16 +47,12 @@ export const signUp = async ({ password, ...userData }: SignUpParams) => {
       `${firstName} ${lastName}`
     );
 
-    console.log("newUserAccount", newUserAccount);
-
     if (!newUserAccount) throw new Error("Failed to create user account");
 
     const dwollaCustomerUrl = await createDwollaCustomer({
       ...userData,
       type: "personal",
     });
-
-    console.log("dwollaCustomerUrl", dwollaCustomerUrl);
 
     if (!dwollaCustomerUrl) throw new Error("Failed to create Dwolla customer");
 
@@ -127,7 +123,7 @@ export const createLinkToken = async (user: User) => {
 
     const response = await plaidClient.linkTokenCreate(tokenParams);
 
-    return parseStringify({ link: response.data.link_token });
+    return parseStringify({ linkToken: response.data.link_token });
   } catch (error) {
     console.error("user actions >> createLinkToken", error);
   }
